@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Comment;
+use App\Models\File;
 
 class Task extends Model
 {
@@ -25,5 +27,15 @@ class Task extends Model
     public function subTasks()
     {
         return $this->hasMany(Task::class, 'parent_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function files()
+    {   
+        return $this->hasMany(File::class);
     }
 }

@@ -28,6 +28,21 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function files()
+    {
+        return $this->hasMany(File::class);
+    }
+
     /**
      * Get the attributes that should be cast.
      *

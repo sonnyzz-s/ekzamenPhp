@@ -19,8 +19,8 @@ class FileController extends Controller
     {
         $data = $request->validated();
 
-        // Сохраняем файл
-        $path = $request->file('file')->store('tasks', 'public');
+        
+        $path = $request->file('file')->store('tasks', 'public'); // сохраняет файл
 
         File::create([
             'task_id' => $data['task_id'],

@@ -9,32 +9,28 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    // Все задачи
     public function index(Request $request)
     {
         $query = Task::with(['subTasks', 'comments', 'files']);
 
-        // Поиск
-        if ($request->search) {
-            $query->where('title', 'like', '%' . $request->search . '%') ->orWhere('description', 'like', '%' . $request->search . '%')->orWhere('hashtag', 'like', '%' . $request->search . '%');
-        }
+      if ($request->search) 
+        {         
+    $search = '%' . $request->search . '%';
+    $query->where('title', 'like', $search)->orWhere('description', 'like', $search)->orWhere('hashtag', 'like', $search);
+}
 
-        // День
         if ($request->period == 'day') {
             $query->whereDate('end_date', today());
         }
 
-        // Неделя
         if ($request->period == 'week') {
             $query->whereBetween('end_date', [now(), now()->addWeek()]);
         }
 
-        // Месяц
         if ($request->period == 'month') {
             $query->whereBetween('end_date', [now(), now()->addMonth()]);
         }
 
-        // Год
         if ($request->period == 'year') {
             $query->whereBetween('end_date', [now(), now()->addYear()]);
         }

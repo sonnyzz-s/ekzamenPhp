@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Inertia\Inertia;
 
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
@@ -24,26 +25,32 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return response()->json([
-        'message' => 'user registered',
-        'user' => $user], 201);
+        return response()->json(['message' => 'user registered', 'user' => $user], 201);
     }
 
-    public function login(LoginRequest $request)
-    {
-        if (!Auth::attempt($request->validated())) {
+   public function login(LoginRequest $request)
+   {
+    $data = $request->validated();
 
-            return response()->json([
-                'message' => 'invalid data'], 401);
-        }
+    $user = User::where('name', $data['name'])
+        ->where('email', $data['email'])
+        ->first();
 
-        $request->session()->regenerate();
-
+    if (!$user || !Hash::check($data['password'], $user->password)) {
         return response()->json([
-            'message' => 'log in',
-            'user' => Auth::user()
-        ]);
+            'message' => 'invalid data'
+        ], 401);
     }
+
+    Auth::login($user);
+
+    $request->session()->regenerate();
+
+    return response()->json([
+        'message' => 'log in',
+        'user' => $user
+    ]);
+}
 
     public function logout(Request $request)
     {
@@ -61,5 +68,15 @@ class AuthController extends Controller
     public function user(Request $request)
     {
         return response()->json($request->user());
+    }
+
+    public function showRegister()
+    {
+        return Inertia::render('register');
+    }
+
+    public function showLogin()
+    {
+        return Inertia::render('login');
     }
 }

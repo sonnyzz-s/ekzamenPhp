@@ -10,13 +10,12 @@ use App\Http\Controllers\FileController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
 
     Route::get('/tasks', [TaskController::class, 'index']);
-    Route::get('/tasks/{id}', [TaskController::class, 'show']);
     Route::post('/tasks', [TaskController::class, 'store']);
     Route::put('/tasks/{id}', [TaskController::class, 'update']);
     Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
@@ -29,5 +28,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/files', [FileController::class, 'store']);
     Route::get('/files/{id}/download', [FileController::class, 'download']);
     Route::delete('/files/{id}', [FileController::class, 'destroy']);
-
 });

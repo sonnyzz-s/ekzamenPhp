@@ -6,6 +6,7 @@ use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class TaskController extends Controller
 {
@@ -13,11 +14,10 @@ class TaskController extends Controller
     {
         $query = Task::with(['subTasks', 'comments', 'files']);
 
-      if ($request->search) 
-        {         
-    $search = '%' . $request->search . '%';
-    $query->where('title', 'like', $search)->orWhere('description', 'like', $search)->orWhere('hashtag', 'like', $search);
-}
+      if ($request->search) {         
+            $search = '%' . $request->search . '%';
+            $query->where('title', 'like', $search)->orWhere('description', 'like', $search)->orWhere('hashtag', 'like', $search);
+        }
 
         if ($request->period == 'day') {
             $query->whereDate('end_date', today());
@@ -35,9 +35,13 @@ class TaskController extends Controller
             $query->whereBetween('end_date', [now(), now()->addYear()]);
         }
 
-        return response()->json(
-            $query->orderBy('end_date')->paginate(10)
-        );
+        $tasks = $query->orderBy('end_date')->paginate(10)->withQueryString();
+
+        return Inertia::render('tasks/index', [
+            'tasks' => $tasks,
+            'search' => $request->search,
+            'period' => $request->period
+        ]);
     }
 
     public function show($id)
@@ -45,11 +49,12 @@ class TaskController extends Controller
         $task = Task::with(['subTasks', 'comments', 'files'])->find($id);
 
         if (!$task) {
-            return response()->json([
-                'message' => 'task not found'], 404);
+            return response()->json(['message' => 'task not found'], 404);
         }
 
-        return response()->json($task);
+        
+        return Inertia::render('tasks/show', ['task' => $task]);
+
     }
 
     public function store(StoreTaskRequest $request)
@@ -61,35 +66,37 @@ class TaskController extends Controller
         $task = Task::create($data);
 
         return response()->json($task, 201);
+
     }
 
     public function update(UpdateTaskRequest $request, $id)
-    {
-        $task = Task::find($id);
+{
+    $task = Task::find($id);
 
-        if (!$task) {
-            return response()->json([
-                'message' => 'task not found'], 404);
-        }
-
-        $task->update($request->validated());
-
-        return response()->json($task);
+    if (!$task) {
+        return response()->json(['message' => 'task not found'], 404);
     }
+
+    $task->update($request->validated());
+
+    return response()->json(['message' => 'task updated', 'task' => $task]);
+}
 
     public function destroy($id)
     {
         $task = Task::find($id);
 
         if (!$task) {
-            return response()->json([
-                'message' => 'Task not found'], 404);
+            return response()->json(['message' => 'task not found'], 404);
         }
 
         $task->delete();
 
-        return response()->json([
-            'message' => 'task deleted'
-        ]);
+       return response()->json(['message' => 'task deleted']);
+    }
+
+    public function create()
+    {
+        return Inertia::render('tasks/create');
     }
 }

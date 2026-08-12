@@ -19,7 +19,7 @@ class UpdateTaskRequest extends FormRequest
 
             'title' => 'sometimes|string|max:255',
 
-            'priority' => 'sometimes|in:low,medium,high',
+            'priority' => 'sometimes|in:low,normal,high',
 
             'end_date' => 'sometimes|date|after:today',
 

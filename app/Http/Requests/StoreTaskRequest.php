@@ -21,7 +21,7 @@ class StoreTaskRequest extends FormRequest
 
             'priority' => 'required|in:low,normal,high',
 
-            'end_date' => 'required|date|after:today',
+            'end_date' => 'required|date|after_or_equal:today',
 
             'description' => 'nullable|string',
 

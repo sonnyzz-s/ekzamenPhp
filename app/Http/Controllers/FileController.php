@@ -16,30 +16,22 @@ class FileController extends Controller
     }
 
     public function store(StoreFileRequest $request)
-    {
-        $data = $request->validated();
+{
+    $data = $request->validated();
 
-        
-        $path = $request->file('file')->store('tasks', 'public'); // сохраняет файл
+    $path = $request->file('file')->store('tasks', 'public');
 
-        File::create([
-            'task_id' => $data['task_id'],
-            'user_id' => auth()->id(),
-            'path' => $path
-        ]);
+    $file = File::create(['task_id' => $data['task_id'], 'user_id' => auth()->id(), 'path' => $path ]);
 
-        return response()->json([
-            'message' => 'File uploaded',
-            'path' => $path], 201);
-    }
+    return response()->json($file, 201);
+}
 
     public function download($id)
     {
         $file = File::find($id);
 
         if (!$file) {
-            return response()->json([
-                'message' => 'File not found'], 404);
+            return response()->json(['message' => 'File not found'], 404);
         }
 
         return Storage::disk('public')->download($file->path);
@@ -50,16 +42,14 @@ class FileController extends Controller
         $file = File::find($id);
 
         if (!$file) {
-            return response()->json([
-                'message' => 'file not found'], 404);
+            return response()->json(['message' => 'file not found'], 404);
         }
 
         Storage::disk('public')->delete($file->path);
 
         $file->delete();
 
-        return response()->json([
-            'message' => 'file deleted'
+        return response()->json(['message' => 'file deleted'
         ]);
     }
 }

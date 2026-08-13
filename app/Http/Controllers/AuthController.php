@@ -30,11 +30,13 @@ class AuthController extends Controller
 
    public function login(LoginRequest $request)
    {
-    $data = $request->validated();
+        $data = $request->validate([
+        'name' => 'required|string',
+        'email' => 'required|email',
+        'password' => 'required|string',
+        ]);
 
-    $user = User::where('name', $data['name'])
-        ->where('email', $data['email'])
-        ->first();
+    $user = User::where('name', $data['name'])->where('email', $data['email'])->first();
 
     if (!$user || !Hash::check($data['password'], $user->password)) {
         return response()->json([
